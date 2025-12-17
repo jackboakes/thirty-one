@@ -1,6 +1,3 @@
-\# Thirty One
-
-
-
+# Thirty One
 WIP
 
