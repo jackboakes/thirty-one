@@ -1,44 +1,75 @@
 #include "raylib.h"
+#include <algorithm>
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
+struct GameResolution
+{
+    static constexpr int width { 1280 };
+    static constexpr int height { 720 };
+    static constexpr float f_Width { static_cast<float>(width) };
+    static constexpr float f_Height { static_cast<float>(height) };
+};
+
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(GameResolution::width, GameResolution::height, "Thirty One");
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+    // start with window max size
+    SetWindowState(FLAG_WINDOW_MAXIMIZED);
+    SetWindowMinSize(640, 360);
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    RenderTexture2D gameTarget { LoadRenderTexture(GameResolution::width, GameResolution::height) };
+    SetTextureFilter(gameTarget.texture, TEXTURE_FILTER_BILINEAR);
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose())
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
+        float windowWidth { static_cast<float>(GetScreenWidth()) };
+        float windowHeight { static_cast<float>(GetScreenHeight()) };
 
-        // Draw
-        //----------------------------------------------------------------------------------
+        float scale { std::min(windowWidth / GameResolution::f_Width, windowHeight / GameResolution::f_Height) };
+
+        float scaledWidth { GameResolution::f_Width * scale };
+        float scaledHeight { GameResolution::f_Height * scale };
+
+        float offsetX { (windowWidth - scaledWidth) * 0.5f };
+        float offsetY { (windowHeight - scaledHeight) * 0.5f };
+
+        // draw gameplay area to RenderTexture2D
+        BeginTextureMode(gameTarget);
+        ClearBackground(BLANK);
+
+        // turn this on to see where the texture2d is rendering
+        DrawRectangle(0, 0, GameResolution::width, GameResolution::height, Fade(BLACK, 0.5f));
+
+        DrawCircle(640, 360, 50, RED);
+
+
+        EndTextureMode();
+
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        // letterbox area background
+        ClearBackground(DARKBLUE);
 
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+
+        // insert shader background here
+
+        // Draw Gameplay Area
+        DrawTexturePro(
+            gameTarget.texture,
+            { 0, 0, GameResolution::f_Width, -GameResolution::f_Height },
+            { offsetX, offsetY, scaledWidth, scaledHeight },
+            { 0, 0 },
+            0.0f,
+            WHITE
+        );
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
-    return 0;
+    UnloadRenderTexture(gameTarget);
+    CloseWindow();
 }
