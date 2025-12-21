@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20...4.2)
 
 project(thirty_one
         VERSION 0.1.0
-        DESCRIPTION "Thirty-One card game built with raylib"
+        DESCRIPTION "Thirty One card game built with raylib"
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -24,13 +24,24 @@ if (NOT raylib_FOUND)
     FetchContent_MakeAvailable(raylib)
 endif()
 
-add_executable(${PROJECT_NAME}
-    src/main.cpp
+set(HEADERS
+    include/gamestate.h
+    include/gamemode.h
 )
+
+set(SOURCES
+    src/main.cpp
+    src/gamestate.cpp
+    src/gamemode.cpp
+)
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE raylib
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE include/)
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE 

@@ -9,11 +9,27 @@ struct GameResolution
     static constexpr float f_Height { static_cast<float>(height) };
 };
 
-int main(void)
-{
 
+// Helper fuction to test colour changes with shader
+Vector3 ColourToVec3(Color colour)
+{
+    return Vector3 {
+        colour.r / 255.0f,
+        colour.g / 255.0f,
+        colour.b / 255.0f
+    };
+}
+
+int main()
+{
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(GameResolution::width, GameResolution::height, "Thirty One");
+    
+    Shader shader = LoadShader(0, "../res/shaders/placeholder.fs");
+
+    int iTimeLoc { GetShaderLocation(shader, "iTime") };
+    int iResolutionLoc { GetShaderLocation(shader, "iResolution") };
+    int iColourLoc { GetShaderLocation(shader, "iColour") };
 
     // start with window max size
     SetWindowState(FLAG_WINDOW_MAXIMIZED);
@@ -28,6 +44,13 @@ int main(void)
     {
         float windowWidth { static_cast<float>(GetScreenWidth()) };
         float windowHeight { static_cast<float>(GetScreenHeight()) };
+
+        float time { static_cast<float>(GetTime()) };
+        float resolution[2] { windowWidth, windowHeight };
+        Vector3 fireColor { ColourToVec3(PURPLE) };
+        SetShaderValue(shader, iTimeLoc, &time, SHADER_UNIFORM_FLOAT);
+        SetShaderValue(shader, iResolutionLoc, resolution, SHADER_UNIFORM_VEC2);
+        SetShaderValue(shader, iColourLoc, &fireColor, SHADER_UNIFORM_VEC3);
 
         float scale { std::min(windowWidth / GameResolution::f_Width, windowHeight / GameResolution::f_Height) };
 
@@ -52,10 +75,11 @@ int main(void)
         BeginDrawing();
 
         // letterbox area background
-        ClearBackground(DARKBLUE);
+        ClearBackground(BLACK);
 
-
-        // insert shader background here
+        BeginShaderMode(shader);
+        DrawRectangle(0, 0, windowWidth, windowHeight, BLACK);
+        EndShaderMode();
 
         // Draw Gameplay Area
         DrawTexturePro(
