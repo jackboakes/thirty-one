@@ -25,11 +25,13 @@ if (NOT raylib_FOUND)
 endif()
 
 set(HEADERS
+    include/application.h
     include/gamestate.h
     include/gamemode.h
 )
 
 set(SOURCES
+    src/application.cpp
     src/main.cpp
     src/gamestate.cpp
     src/gamemode.cpp

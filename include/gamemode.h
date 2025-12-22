@@ -1,3 +1,5 @@
+#pragma once
+
 class GameMode {
 private:
 	// ui composition goes here
