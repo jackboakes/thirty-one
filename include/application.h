@@ -18,11 +18,12 @@ private:
 	int m_ResolutionLoc {};
 	int m_ColourLoc {};
 
+	Application();
+	~Application();
 	void Update();
 	void Draw();
 
 public:
-	Application();
-	~Application();
+	static Application& Instance();
 	void Run();
 };

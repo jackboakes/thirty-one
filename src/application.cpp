@@ -37,6 +37,12 @@ Application::~Application()
 	CloseWindow();
 }
 
+Application& Application::Instance()
+{
+	static Application instance;
+	return instance;
+}
+
 void Application::Run()
 {
 	while (!WindowShouldClose())

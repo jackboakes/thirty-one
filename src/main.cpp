@@ -2,6 +2,6 @@
 
 int main()
 {
-	Application application;
+	Application& application { Application::Instance() };
 	application.Run();
 }
