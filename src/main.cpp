@@ -5,7 +5,7 @@
 int main()
 {
 	Application& application { Application::Instance() };
-	application.PushLayer(new BackgroundLayer());
-	application.PushLayer(new TestLayer());
+	application.PushLayer<BackgroundLayer>();
+	application.PushLayer<TestLayer>();
 	application.Run();
 }

@@ -1,9 +1,7 @@
 #pragma once
 #include "raylib.h"
 #include "layer.h"
-#include "globals.h"
-#include "card.h"
-#include <algorithm>
+
 
 class TestLayer : public Layer {
 private:

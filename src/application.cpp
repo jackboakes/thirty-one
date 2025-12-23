@@ -1,8 +1,5 @@
 #include "application.h"
-#include <algorithm>
 #include "globals.h"
-
-
 
 Application::Application()
 {
@@ -16,10 +13,7 @@ Application::Application()
 
 Application::~Application()
 {
-	for (Layer* layer : m_layerStack)
-		delete layer;
 	m_layerStack.clear();
-
 	CloseWindow();
 }
 
@@ -41,7 +35,7 @@ void Application::Run()
 
 void Application::Update(float deltaTime)
 {
-	for (Layer* layer : m_layerStack)
+	for (auto& layer : m_layerStack)
 	{
 		layer->Update(deltaTime);
 	}
@@ -50,7 +44,7 @@ void Application::Update(float deltaTime)
 void Application::Draw()
 {
 	BeginDrawing();
-	for (Layer* layer : m_layerStack)
+	for (auto& layer : m_layerStack)
 	{
 		layer->Draw();
 	}

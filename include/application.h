@@ -2,12 +2,13 @@
 #include "raylib.h"
 #include <vector>
 #include "layer.h"
+#include <memory>
 
 
 
 class Application {
 private:
-	std::vector<Layer*> m_layerStack;
+	std::vector<std::unique_ptr<Layer>> m_layerStack;
 
 	Application();
 	~Application();
@@ -18,12 +19,14 @@ public:
 	static Application& Instance();
 	void Run();
 
-	void PushLayer(Layer* state)
+	template<typename TLayer>
+	requires(std::is_base_of_v<Layer, TLayer>)
+	void PushLayer()
 	{
-		m_layerStack.push_back(state);
+		m_layerStack.push_back(std::make_unique<TLayer>());
 	}
 
-	void TransitionLayer(Layer* toState)
+	void TransitionLayer(std::unique_ptr<Layer> tolayer)
 	{
 		// TODO:: Not sure how to handle this yet
 	}

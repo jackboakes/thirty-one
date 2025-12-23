@@ -1,6 +1,7 @@
 #include "testlayer.h"
-
-
+#include "globals.h"
+#include "card.h"
+#include <algorithm>
 
 TestLayer::TestLayer()
 {
