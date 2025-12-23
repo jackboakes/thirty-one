@@ -1,5 +1,6 @@
 #include "application.h"
 #include <algorithm>
+#include <card.h>
 
 // Helper fuction to test colour changes with shader
 Vector3 ColourToVec3(Color colour)
@@ -20,6 +21,8 @@ Application::Application()
 	SetWindowMinSize(640, 360);
 	SetTargetFPS(60);
 
+	cardAtlas = LoadTexture("../assets/cardAtlas.png");
+	SetTextureFilter(cardAtlas, TEXTURE_FILTER_POINT);
 
 	m_backgroundShader = LoadShader(0, "../res/shaders/placeholder.fs");
 	m_TimeLoc = GetShaderLocation(m_backgroundShader, "iTime");
@@ -33,6 +36,7 @@ Application::Application()
 
 Application::~Application()
 {
+	UnloadTexture(cardAtlas);
 	UnloadRenderTexture(m_gameCanvas);
 	CloseWindow();
 }
@@ -64,7 +68,14 @@ void Application::Draw()
 
 	// turn this on to see where the texture2d is rendering
 	DrawRectangle(0, 0, GameResolution::width, GameResolution::height, Fade(BLACK, 0.5f));
-	DrawCircle(640, 360, 50, RED);
+
+	float cardW = cardAtlas.width / 17.0f;
+	float cardH = cardAtlas.height / 4.0f;
+
+	Card testCard = { Suit::Spades, Rank::King };
+	Rectangle src = testCard.GetSourceRec(cardW, cardH);
+	Rectangle dest = { GameResolution::width / 2, GameResolution::height / 2, cardW, cardH};
+	DrawTexturePro(cardAtlas, src, dest, { 0,0 }, 0.0f, WHITE);
 
 	EndTextureMode();
 

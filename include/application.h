@@ -26,4 +26,6 @@ private:
 public:
 	static Application& Instance();
 	void Run();
+
+	Texture2D cardAtlas;
 };

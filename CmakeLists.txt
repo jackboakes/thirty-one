@@ -26,12 +26,14 @@ endif()
 
 set(HEADERS
     include/application.h
+    include/card.h
     include/gamestate.h
     include/gamemode.h
 )
 
 set(SOURCES
     src/application.cpp
+    src/card.cpp
     src/main.cpp
     src/gamestate.cpp
     src/gamemode.cpp
