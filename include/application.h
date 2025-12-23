@@ -1,31 +1,30 @@
 #pragma once
 #include "raylib.h"
+#include <vector>
+#include "layer.h"
 
 
-struct GameResolution
-{
-	static constexpr int width { 1280 };
-	static constexpr int height { 720 };
-	static constexpr float f_Width { static_cast<float>(width) };
-	static constexpr float f_Height { static_cast<float>(height) };
-};
 
 class Application {
 private:
-	RenderTexture2D m_gameCanvas {};
-	Shader m_backgroundShader {};
-	int m_TimeLoc {};
-	int m_ResolutionLoc {};
-	int m_ColourLoc {};
+	std::vector<Layer*> m_layerStack;
 
 	Application();
 	~Application();
-	void Update();
+	void Update(float deltaTime);
 	void Draw();
 
 public:
 	static Application& Instance();
 	void Run();
 
-	Texture2D cardAtlas;
+	void PushLayer(Layer* state)
+	{
+		m_layerStack.push_back(state);
+	}
+
+	void TransitionLayer(Layer* toState)
+	{
+		// TODO:: Not sure how to handle this yet
+	}
 };

@@ -26,17 +26,22 @@ endif()
 
 set(HEADERS
     include/application.h
+    include/backgroundlayer.h
     include/card.h
     include/gamestate.h
-    include/gamemode.h
+    include/layer.h
+    include/testlayer.h
+    include/globals.h
 )
 
 set(SOURCES
     src/application.cpp
+    src/backgroundlayer.cpp
     src/card.cpp
     src/main.cpp
     src/gamestate.cpp
-    src/gamemode.cpp
+    src/layer.cpp
+    src/testlayer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
