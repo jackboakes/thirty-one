@@ -35,13 +35,13 @@ void Hand::OnLayout()
 
 		float newX = startX + (i * xStride);
 		float newY = (size.y - child->size.y) / 2.0f; 
-		child->position = { newX, newY };
+		child->localPosition = { newX, newY };
 	}
 }
 
 void Hand::OnRender()
 {
-	Rectangle bgRect { screenPos.x, screenPos.y, size.x, size.y };
+	Rectangle bgRect { screenPosition.x, screenPosition.y, size.x, size.y };
 
 	DrawRectangleRounded(bgRect, 0.1f, 10, Fade(BLACK, 0.35f));
 }

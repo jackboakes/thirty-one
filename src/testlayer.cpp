@@ -20,7 +20,7 @@ TestLayer::TestLayer()
 	auto playerHand = std::make_unique<Hand>();
 	float xPos = (GameResolution::f_Width - playerHand->size.x) * 0.5f;
 	float yPos = GameResolution::f_Height - playerHand->size.y - 40.0f;
-	playerHand->position = { xPos, yPos };
+	playerHand->localPosition = { xPos, yPos };
 
 	Hand* handPtr = playerHand.get();
 

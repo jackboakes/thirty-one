@@ -24,12 +24,12 @@ void Element::Layout()
 {
 	if (m_Parent)
 	{
-		screenPos.x = m_Parent->screenPos.x + position.x;
-		screenPos.y = m_Parent->screenPos.y + position.y;
+		screenPosition.x = m_Parent->screenPosition.x + localPosition.x;
+		screenPosition.y = m_Parent->screenPosition.y + localPosition.y;
 	}
 	else
 	{
-		screenPos = position;
+		screenPosition = localPosition;
 	}
 
 	OnLayout();

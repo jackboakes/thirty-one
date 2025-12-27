@@ -13,11 +13,11 @@ public:
 	void Layout();
 
 	// Relative to parent
-	Vector2 position { 0.0f, 0.0f };
+	Vector2 localPosition { 0.0f, 0.0f };
 	// Width/Height
 	Vector2 size { 0.0f, 0.0f };
 	// Calculated absolute world position
-	Vector2 screenPos { 0.0f, 0.0f };
+	Vector2 screenPosition { 0.0f, 0.0f };
 
 protected:
 	virtual void OnRender() = 0;

@@ -66,8 +66,8 @@ Rectangle Card::GetSourceRec(float slotWidth, float slotHeight) const
 void Card::OnRender()
 {
     Rectangle destRec {
-            screenPos.x,
-            screenPos.y,
+            screenPosition.x,
+            screenPosition.y,
             size.x,
             size.y
     };
