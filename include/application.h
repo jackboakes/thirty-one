@@ -3,8 +3,7 @@
 #include <vector>
 #include "layer.h"
 #include <memory>
-
-
+#include <type_traits>
 
 class Application {
 private:
@@ -26,7 +25,7 @@ public:
 		m_layerStack.push_back(std::make_unique<TLayer>());
 	}
 
-	void TransitionLayer(std::unique_ptr<Layer> tolayer)
+	void TransitionLayer(std::unique_ptr<Layer> toLayer)
 	{
 		// TODO:: Not sure how to handle this yet
 	}

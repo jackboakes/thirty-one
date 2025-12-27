@@ -1,27 +1,56 @@
 #include "testlayer.h"
 #include "globals.h"
+#include "hand.h"
 #include "card.h"
 #include <algorithm>
 
+class SceneRoot : public Element {
+protected:
+	void OnRender() override {}
+	void OnLayout() override {}
+};
+
 TestLayer::TestLayer()
 {
-	m_cardAtlas = LoadTexture("../assets/cardAtlas.png");
-	SetTextureFilter(m_cardAtlas, TEXTURE_FILTER_POINT);
-
 	// Virtual screen for game area
 	m_gameCanvas = LoadRenderTexture(GameResolution::width, GameResolution::height);
 	SetTextureFilter(m_gameCanvas.texture, TEXTURE_FILTER_BILINEAR);
+
+	m_SceneRoot = std::make_unique<SceneRoot>();
+	auto playerHand = std::make_unique<Hand>();
+	float xPos = (GameResolution::f_Width - playerHand->size.x) * 0.5f;
+	float yPos = GameResolution::f_Height - playerHand->size.y - 40.0f;
+	playerHand->position = { xPos, yPos };
+
+	Hand* handPtr = playerHand.get();
+
+	auto aceOfSpades = std::make_unique<Card>(Suit::Spades, Rank::Ace);
+	handPtr->AddCard(std::move(aceOfSpades));
+
+	auto tenOfSpades = std::make_unique<Card>(Suit::Spades, Rank::Ten);
+	handPtr->AddCard(std::move(tenOfSpades));
+
+	auto jackOfHearts = std::make_unique<Card>(Suit::Hearts, Rank::Jack);
+	handPtr->AddCard(std::move(jackOfHearts));
+
+	auto kingCard = std::make_unique<Card>(Suit::Clubs, Rank::King);
+	handPtr->AddCard(std::move(kingCard));
+
+	m_SceneRoot->AddChild(std::move(playerHand));
 }
 
 TestLayer::~TestLayer()
 {
-	UnloadTexture(m_cardAtlas);
 	UnloadRenderTexture(m_gameCanvas);
+	m_SceneRoot.reset();
 }
 
 void TestLayer::Update(float deltaTime)
 {
-
+	if (m_SceneRoot) 
+	{
+		m_SceneRoot->Layout();
+	}
 }
 
 void TestLayer::Draw()
@@ -30,16 +59,12 @@ void TestLayer::Draw()
 	ClearBackground(BLANK);
 
 	// turn this on to see where the texture2d is rendering
-	DrawRectangle(0, 0, GameResolution::width, GameResolution::height, Fade(BLACK, 0.5f));
+	//DrawRectangle(0, 0, GameResolution::width, GameResolution::height, Fade(BLACK, 0.5f));
 
-	float cardW = m_cardAtlas.width / 17.0f;
-	float cardH = m_cardAtlas.height / 4.0f;
-
-	Card testCard = { Suit::Spades, Rank::King };
-	Rectangle src = testCard.GetSourceRec(cardW, cardH);
-	Rectangle dest = { GameResolution::width / 2, GameResolution::height / 2, cardW, cardH };
-	DrawTexturePro(m_cardAtlas, src, dest, { 0,0 }, 0.0f, WHITE);
-
+	if (m_SceneRoot) 
+	{
+		m_SceneRoot->Render();
+	}
 	EndTextureMode();
 
 	float windowWidth { static_cast<float>(GetScreenWidth()) };

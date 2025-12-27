@@ -1,12 +1,15 @@
 #pragma once
 #include "raylib.h"
 #include "layer.h"
+#include "element.h"
+#include <memory>
 
 
 class TestLayer : public Layer {
 private:
-	Texture2D m_cardAtlas {};
 	RenderTexture2D m_gameCanvas {};
+	std::unique_ptr<Element> m_SceneRoot;
+
 public:
 	TestLayer();
 	~TestLayer() override;

@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include "element.h"
 
 enum class Suit {
 	Diamonds,
@@ -24,12 +25,21 @@ enum class Rank {
 	King
 };
 
-class Card {
+class Card : public Element {
 private:
+	Suit m_Suit {};
+	Rank m_Rank {};
+	static Texture2D s_CardAtlasTexture;
+	static int s_RefCount;
+	Rectangle m_SourceRec {};
 
+protected:
+	void OnRender() override;
+	void OnLayout() override {}
 public:
-	Suit suit {};
-	Rank rank {};
+	Card(Suit suit, Rank rank);
+	~Card();
+
 	bool isFaceUp { true };
 
 	Rectangle GetSourceRec(float slotWidth, float slotHeight) const;

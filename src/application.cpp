@@ -35,7 +35,7 @@ void Application::Run()
 
 void Application::Update(float deltaTime)
 {
-	for (auto& layer : m_layerStack)
+	for (const std::unique_ptr<Layer>& layer : m_layerStack)
 	{
 		layer->Update(deltaTime);
 	}
@@ -44,7 +44,7 @@ void Application::Update(float deltaTime)
 void Application::Draw()
 {
 	BeginDrawing();
-	for (auto& layer : m_layerStack)
+	for (const std::unique_ptr<Layer>& layer : m_layerStack)
 	{
 		layer->Draw();
 	}

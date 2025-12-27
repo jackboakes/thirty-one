@@ -32,6 +32,8 @@ set(HEADERS
     include/layer.h
     include/testlayer.h
     include/globals.h
+    include/hand.h
+    include/element.h
 )
 
 set(SOURCES
@@ -40,8 +42,9 @@ set(SOURCES
     src/card.cpp
     src/main.cpp
     src/gamestate.cpp
-    src/layer.cpp
     src/testlayer.cpp
+    src/hand.cpp
+    src/element.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
