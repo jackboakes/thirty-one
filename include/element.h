@@ -10,6 +10,8 @@ public:
 	void Render();
 
 	void AddChild(std::unique_ptr<Element> child);
+	std::unique_ptr<Element> RemoveChild(Element* childToRemove);
+	const std::vector<std::unique_ptr<Element>>& GetChildren() const { return m_Children; }
 	void Layout();
 
 	// Relative to parent

@@ -13,7 +13,7 @@ private:
 	~Application();
 	void Update(float deltaTime);
 	void Draw();
-
+	void ProcessInput();
 public:
 	static Application& Instance();
 	void Run();

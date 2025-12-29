@@ -16,7 +16,7 @@ Card::Card(Suit suit, Rank rank)
     float spriteWidth = 64.0f;
     float spriteHeight = 96.0f;
 
-    size = { 80.0f, 120.0f };
+    size = { spriteWidth * 2.0f, spriteHeight * 2.0f };
     m_SourceRec = GetSourceRec(spriteWidth, spriteHeight);
 }
 
