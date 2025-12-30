@@ -58,11 +58,6 @@ void TestLayer::Update(float deltaTime)
 
         m_DraggedCard->screenPosition.x = std::clamp(targetX, minWorld.x, maxWorld.x - m_DraggedCard->size.x);
         m_DraggedCard->screenPosition.y = std::clamp(targetY, minWorld.y, maxWorld.y - m_DraggedCard->size.y);
-
-        if (m_HandPtr)
-        {
-            m_HandPtr->UpdateSort(m_DraggedCard);
-        }
     }
 
     if (m_SceneRoot)

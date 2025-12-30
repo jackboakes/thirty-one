@@ -7,6 +7,39 @@ Hand::Hand()
 	size = { 456.0f, 232.0f };
 }
 
+void Hand::OnUpdate(float deltaTime)
+{
+	// bubble sort based on x positions
+	// TODO:: place this in a function
+	Card* draggedCard { nullptr };
+
+	for (auto& child : m_Children)
+	{
+		Card* card { static_cast<Card*>(child.get()) };
+		if (card->isDragging)
+		{
+			draggedCard = card;
+			break;
+		}
+	}
+
+	if (draggedCard)
+	{
+		std::sort(m_Children.begin(), m_Children.end(),
+			[](const std::unique_ptr<Element>& a, const std::unique_ptr<Element>& b) {
+				return a->screenPosition.x < b->screenPosition.x;
+			});
+
+		if (draggedCard)
+		{
+			draggedCard->localPosition.x = draggedCard->screenPosition.x - screenPosition.x;
+			draggedCard->localPosition.y = draggedCard->screenPosition.y - screenPosition.y;
+		}
+
+		Layout();
+	}
+}
+
 void Hand::AddCard(std::unique_ptr<Card> card)
 {
 	if (m_Children.empty())
@@ -76,21 +109,4 @@ Card* Hand::GetCardAt(Vector2 screenPosition)
 		}
 	}
 	return nullptr;
-}
-
-void Hand::UpdateSort(Element* draggedCard)
-{
-	std::sort(m_Children.begin(), m_Children.end(),
-		[](const std::unique_ptr<Element>& a, const std::unique_ptr<Element>& b) {
-			return a->screenPosition.x < b->screenPosition.x;
-		});
-
-	if (draggedCard)
-	{
-		draggedCard->localPosition.x = draggedCard->screenPosition.x - screenPosition.x;
-		draggedCard->localPosition.y = draggedCard->screenPosition.y - screenPosition.y;
-	}
-
-	Layout();
-
 }

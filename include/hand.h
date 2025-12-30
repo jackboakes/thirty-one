@@ -4,13 +4,14 @@
 class Hand : public Element {
 public:
 	Hand();
-	void OnLayout() override;
-	void OnRender() override;
-	void AddCard(std::unique_ptr<Card> card);
 	void AddChild(std::unique_ptr<Element> child) = delete;
+	void AddCard(std::unique_ptr<Card> card);
 	Card* GetCardAt(Vector2 screenPosition);
 
-	void UpdateSort(Element* draggedCard);
+protected:
+	void OnUpdate(float deltaTime) override;
+	void OnLayout() override;
+	void OnRender() override;
 
 private:
 	float m_CardWidth { 0.0f };
