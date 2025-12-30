@@ -1,20 +1,28 @@
 #include "hand.h"
 
+#include <algorithm>
+
 Hand::Hand()
 {
 	size = { 456.0f, 232.0f };
 }
 
-void Hand::AddCard(std::unique_ptr<Element> card)
+void Hand::AddCard(std::unique_ptr<Card> card)
 {
 	if (m_Children.empty())
 	{
 		m_CardWidth = card->size.x;
 	}
 
-	AddChild(std::move(card));
+	Card* cardPtr { card.get() };
+	Element::AddChild(std::move(card));
 
 	Layout();
+
+	if (cardPtr)
+	{
+		cardPtr->SnapToPosition();
+	}
 }
 
 void Hand::OnLayout()
@@ -33,6 +41,13 @@ void Hand::OnLayout()
 	{
 		auto& child { m_Children[i] };
 
+		// if card is dragging skip layout update
+		const Card* cardPtr { dynamic_cast<Card*>(child.get()) };
+		if (cardPtr && cardPtr->isDragging)
+		{
+			continue;
+		}
+
 		const float cardPositionX { firstCardX + (i * cardSpacingX) };
 		const float cardPositionY { (size.y - child->size.y) / 2.0f };
 		child->localPosition = { cardPositionX, cardPositionY };
@@ -46,11 +61,13 @@ void Hand::OnRender()
 	DrawRectangleRounded(bgRect, 0.1f, 10, Fade(BLACK, 0.35f));
 }
 
-Element* Hand::GetCardAt(Vector2 screenPosition)
+Card* Hand::GetCardAt(Vector2 screenPosition)
 {
 	for (auto it { m_Children.rbegin() }; it != m_Children.rend(); ++it)
 	{
-		Element* card { it->get() };
+		Element* element { it->get() };
+		Card* card { static_cast<Card*>(element) };
+
 		Rectangle rec { card->screenPosition.x, card->screenPosition.y, card->size.x, card->size.y };
 
 		if (CheckCollisionPointRec(screenPosition, rec))
@@ -59,4 +76,21 @@ Element* Hand::GetCardAt(Vector2 screenPosition)
 		}
 	}
 	return nullptr;
+}
+
+void Hand::UpdateSort(Element* draggedCard)
+{
+	std::sort(m_Children.begin(), m_Children.end(),
+		[](const std::unique_ptr<Element>& a, const std::unique_ptr<Element>& b) {
+			return a->screenPosition.x < b->screenPosition.x;
+		});
+
+	if (draggedCard)
+	{
+		draggedCard->localPosition.x = draggedCard->screenPosition.x - screenPosition.x;
+		draggedCard->localPosition.y = draggedCard->screenPosition.y - screenPosition.y;
+	}
+
+	Layout();
+
 }

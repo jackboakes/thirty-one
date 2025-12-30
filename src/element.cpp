@@ -3,7 +3,12 @@
 
 void Element::Update(float deltaTime)
 {
+	OnUpdate(deltaTime);
 
+	for (auto& child : m_Children)
+	{
+		child->Update(deltaTime);
+	}
 }
 
 void Element::Render()
@@ -11,7 +16,10 @@ void Element::Render()
 	OnRender();
 	for (auto& child : m_Children)
 	{
-		child->Render();
+		if (child->isVisible)
+		{
+			child->Render();
+		}
 	}
 }
 

@@ -1,4 +1,6 @@
 #include "card.h"
+#include "raylib.h"
+#include "raymath.h"
 
 Texture2D Card::s_CardAtlasTexture;
 int Card::s_RefCount = 0;
@@ -63,16 +65,28 @@ Rectangle Card::GetSourceRec(float slotWidth, float slotHeight) const
     };
 }
 
+void Card::OnUpdate(float deltaTime)
+{
+    if (Vector2Distance(renderPosition, screenPosition) < 0.5f)
+    {
+        renderPosition = screenPosition;
+    }
+    else
+    {
+        renderPosition = Vector2Lerp(renderPosition, screenPosition, deltaTime * m_SmoothSpeed);
+    }
+}
+
 void Card::OnRender()
 {
     Rectangle destRec {
-            screenPosition.x,
-            screenPosition.y,
+            renderPosition.x,
+            renderPosition.y,
             size.x,
             size.y
     };
 
-    Vector2 origin { 0.0f, 0.0f };
+    constexpr Vector2 origin { 0.0f, 0.0f };
 
     DrawTexturePro(
         s_CardAtlasTexture,
@@ -82,4 +96,10 @@ void Card::OnRender()
         0.0f, 
         WHITE
     );
+}
+
+// Bypass lerp and move rendered instantly to screenPosition
+void Card::SnapToPosition()
+{
+    renderPosition = screenPosition;
 }

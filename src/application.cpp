@@ -1,5 +1,4 @@
 #include "application.h"
-#include "globals.h"
 
 Application::Application()
 {
@@ -39,9 +38,9 @@ void Application::ProcessInput()
 {
 	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
 	{
-		for (auto i { m_layerStack.rbegin() }; i != m_layerStack.rend(); ++i) 
+		for (auto it { m_layerStack.rbegin() }; it != m_layerStack.rend(); ++it) 
 		{
-			if ((*i)->OnMouseButtonPressed(MOUSE_BUTTON_LEFT))
+			if ((*it)->OnMouseButtonPressed(MOUSE_BUTTON_LEFT))
 			{
 				break;
 			}
@@ -50,9 +49,9 @@ void Application::ProcessInput()
 
 	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) 
 	{
-		for (auto i { m_layerStack.rbegin() }; i != m_layerStack.rend(); ++i) 
+		for (auto it { m_layerStack.rbegin() }; it != m_layerStack.rend(); ++it) 
 		{
-			if ((*i)->OnMouseButtonReleased(MOUSE_BUTTON_LEFT))
+			if ((*it)->OnMouseButtonReleased(MOUSE_BUTTON_LEFT))
 			{
 				break;
 			}
@@ -62,10 +61,10 @@ void Application::ProcessInput()
 	Vector2 mouseDelta = GetMouseDelta();
 	if (mouseDelta.x != 0 || mouseDelta.y != 0) 
 	{
-		for (auto i { m_layerStack.rbegin() }; i != m_layerStack.rend(); ++i)
+		for (auto it { m_layerStack.rbegin() }; it != m_layerStack.rend(); ++it)
 		{
 			Vector2 mousePosition = GetMousePosition();
-			if ((*i)->OnMouseMoved(mousePosition))
+			if ((*it)->OnMouseMoved(mousePosition))
 			{
 				break;
 			}

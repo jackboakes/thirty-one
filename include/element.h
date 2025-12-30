@@ -21,9 +21,13 @@ public:
 	// Calculated absolute world position
 	Vector2 screenPosition { 0.0f, 0.0f };
 
+	bool isVisible { true };
+
 protected:
-	virtual void OnRender() = 0;
-	virtual void OnLayout() = 0;
+	virtual void OnUpdate(float deltaTime) {}
+	virtual void OnRender() {}
+	virtual void OnLayout() {}
+
 
 	std::vector<std::unique_ptr<Element>> m_Children;
 	Element* m_Parent { nullptr };

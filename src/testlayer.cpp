@@ -3,16 +3,12 @@
 #include "card.h"
 #include <algorithm>
 
-class SceneRoot : public Element {
-protected:
-	void OnRender() override {}
-	void OnLayout() override {}
-};
+class SceneRoot : public Element {};
 
 TestLayer::TestLayer()
 {
     m_gameCanvas = LoadRenderTexture(GameResolution::width, GameResolution::height);
-    SetTextureFilter(m_gameCanvas.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(m_gameCanvas.texture, TEXTURE_FILTER_POINT);
 
     m_SceneRoot = std::make_unique<SceneRoot>();
 
@@ -41,19 +37,6 @@ TestLayer::~TestLayer()
     m_SceneRoot.reset();
 }
 
-Vector2 TestLayer::GetCanvasMousePosition() const
-{
-    const float windowWidth { static_cast<float>(GetScreenWidth()) };
-    const float windowHeight { static_cast<float>(GetScreenHeight()) };
-
-    const float scale { std::min((windowWidth / GameResolution::f_Width), (windowHeight / GameResolution::f_Height)) };
-    const float offsetX { (windowWidth - (GameResolution::f_Width * scale)) * 0.5f };
-    const float offsetY { (windowHeight - (GameResolution::f_Height * scale)) * 0.5f };
-
-    const Vector2 mouse { GetMousePosition() };
-    return { ((mouse.x - offsetX) / scale), ((mouse.y - offsetY) / scale) };
-}
-
 void TestLayer::Update(float deltaTime)
 {
     if (m_SceneRoot)
@@ -61,60 +44,71 @@ void TestLayer::Update(float deltaTime)
         m_SceneRoot->Layout();
     }
 
-    if (m_DraggedCard)
+    if (m_DraggedCard && m_DraggedCard->isDragging)
     {
-        const Vector2 mousePosition { GetCanvasMousePosition() };
-        // set dragged card to these positions if inside of clamp range
-        const float targetX { mousePosition.x + m_DragOffset.x };
-        const float targetY { mousePosition.y + m_DragOffset.y };
+        const Vector2 worldMouse { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
+        const float screenWidth { static_cast<float>(GetScreenWidth()) };
+        const float screenHeight { static_cast<float>(GetScreenHeight()) };
 
-        const float maxX { GameResolution::f_Width - m_DraggedCard->size.x };
-        const float maxY { GameResolution::f_Height - m_DraggedCard->size.y };
+        // Clamp to screen edges
+        const float targetX { worldMouse.x + m_DragOffset.x };
+        const float targetY { worldMouse.y + m_DragOffset.y };
+        const Vector2 minWorld { GetScreenToWorld2D({ 0, 0 }, m_Camera2D) };
+        const Vector2 maxWorld { GetScreenToWorld2D({ screenWidth, screenHeight }, m_Camera2D) };
 
-        // clamp card to edge of screen if mouse goes out of bounds
-        m_DraggedCard->screenPosition.x = std::clamp(targetX, 0.0f, maxX);
-        m_DraggedCard->screenPosition.y = std::clamp(targetY, 0.0f, maxY);
+        m_DraggedCard->screenPosition.x = std::clamp(targetX, minWorld.x, maxWorld.x - m_DraggedCard->size.x);
+        m_DraggedCard->screenPosition.y = std::clamp(targetY, minWorld.y, maxWorld.y - m_DraggedCard->size.y);
+
+        if (m_HandPtr)
+        {
+            m_HandPtr->UpdateSort(m_DraggedCard);
+        }
+    }
+
+    if (m_SceneRoot)
+    {
+        m_SceneRoot->Update(deltaTime);
     }
 }
 
 void TestLayer::Draw()
 {
-    BeginTextureMode(m_gameCanvas);
-    ClearBackground(BLANK);
+    CanvasTransform canvasTransform { GetCanvasTransform() };
+    m_Camera2D.zoom = canvasTransform.scale;
+    m_Camera2D.offset = canvasTransform.offset;
+    m_Camera2D.target = { 0, 0 };
+
+    BeginMode2D(m_Camera2D);
 
     if (m_SceneRoot) m_SceneRoot->Render();
 
-    if (m_DraggedCard) m_DraggedCard->Render();
+    // Render dragged out card on top of hand/other elements
+    if (m_DraggedCard && m_DraggedCard->isDragging)
+    {
+        m_DraggedCard->Render();
+    }
 
-    EndTextureMode();
-
-    const float windowWidth { static_cast<float>(GetScreenWidth()) };
-    const float windowHeight { static_cast<float>(GetScreenHeight()) };
-    const float scale { std::min((windowWidth / GameResolution::f_Width), (windowHeight / GameResolution::f_Height)) };
-    float scaledWidth { GameResolution::f_Width * scale };
-    float scaledHeight { GameResolution::f_Height * scale };
-    float offsetX { (windowWidth - scaledWidth) * 0.5f };
-    float offsetY { (windowHeight - scaledHeight) * 0.5f };
-
-    DrawTexturePro(m_gameCanvas.texture,
-        { 0, 0, GameResolution::f_Width, -GameResolution::f_Height },
-        { offsetX, offsetY, scaledWidth, scaledHeight },
-        { 0, 0 }, 0.0f, WHITE);
+    EndMode2D();
 }
 
 bool TestLayer::OnMouseButtonPressed(int button)
 {
     if (button == MOUSE_BUTTON_LEFT)
     {
-        const Vector2 mousePosition { GetCanvasMousePosition() };
+        Vector2 worldMouse { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
 
         // Ask the hand what we clicked
-        Element* hit { m_HandPtr->GetCardAt(mousePosition) };
+        Card* hit { m_HandPtr->GetCardAt(worldMouse) };
         if (hit)
         {
             m_DraggedCard = hit;
-            // Calculate offset so center doesn't snap to mouse
-            m_DragOffset = { hit->screenPosition.x - mousePosition.x, hit->screenPosition.y - mousePosition.y };
+            m_DraggedCard->isDragging = true;
+            m_DraggedCard->isVisible = false;
+
+            m_DragOffset = {
+                m_DraggedCard->screenPosition.x - worldMouse.x,
+                m_DraggedCard->screenPosition.y - worldMouse.y
+            };
             return true;
         }
     }
@@ -125,8 +119,35 @@ bool TestLayer::OnMouseButtonReleased(int button)
 {
     if (button == MOUSE_BUTTON_LEFT)
     {
-        m_DraggedCard = nullptr;
+        if (m_DraggedCard != nullptr)
+        {
+            m_DraggedCard->isVisible = true;
+            m_DraggedCard->isDragging = false;
+            m_DraggedCard = nullptr;
+        }
         return true;
     }
     return false;
 }
+
+// Calculates the render transform required to center and scale the game content 
+// to the current window dimensions without stretching.
+CanvasTransform TestLayer::GetCanvasTransform() const
+{
+    const float windowWidth { static_cast<float>(GetScreenWidth()) };
+    const float windowHeight { static_cast<float>(GetScreenHeight()) };
+
+    const float scale { std::min(
+        windowWidth / GameResolution::f_Width,
+        windowHeight / GameResolution::f_Height
+    ) };
+
+    Vector2 offset {
+        (windowWidth - GameResolution::f_Width * scale) * 0.5f,
+        (windowHeight - GameResolution::f_Height * scale) * 0.5f
+    };
+
+    return { scale, offset };
+}
+
+

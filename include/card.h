@@ -32,15 +32,21 @@ private:
 	static Texture2D s_CardAtlasTexture;
 	static int s_RefCount;
 	Rectangle m_SourceRec {};
+	float m_SmoothSpeed { 10.0f };
 
 protected:
+	void OnUpdate(float deltaTime) override;
 	void OnRender() override;
-	void OnLayout() override {}
+
 public:
 	Card(Suit suit, Rank rank);
 	~Card();
-
+	Vector2 renderPosition { 0.0f, 0.0f };
 	bool isFaceUp { true };
+	Vector2 dragScreenPosition;
+	bool isDragging { false };
 
 	Rectangle GetSourceRec(float slotWidth, float slotHeight) const;
+
+	void SnapToPosition();
 };
