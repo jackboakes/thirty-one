@@ -13,7 +13,6 @@ struct CanvasTransform
 
 class TestLayer : public Layer {
 private:
-    RenderTexture2D m_gameCanvas {};
     Camera2D  m_Camera2D {0};
     std::unique_ptr<Element> m_SceneRoot;
 

@@ -49,12 +49,12 @@ void Element::Layout()
 {
 	if (m_Parent)
 	{
-		screenPosition.x = m_Parent->screenPosition.x + localPosition.x;
-		screenPosition.y = m_Parent->screenPosition.y + localPosition.y;
+		worldPosition.x = m_Parent->worldPosition.x + localPosition.x;
+		worldPosition.y = m_Parent->worldPosition.y + localPosition.y;
 	}
 	else
 	{
-		screenPosition = localPosition;
+		worldPosition = localPosition;
 	}
 
 	OnLayout();

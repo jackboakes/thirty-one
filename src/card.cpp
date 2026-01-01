@@ -67,13 +67,13 @@ Rectangle Card::GetSourceRec(float slotWidth, float slotHeight) const
 
 void Card::OnUpdate(float deltaTime)
 {
-    if (Vector2Distance(renderPosition, screenPosition) < 0.5f)
+    if (Vector2Distance(renderPosition, worldPosition) < 0.5f)
     {
-        renderPosition = screenPosition;
+        renderPosition = worldPosition;
     }
     else
     {
-        renderPosition = Vector2Lerp(renderPosition, screenPosition, deltaTime * m_SmoothSpeed);
+        renderPosition = Vector2Lerp(renderPosition, worldPosition, deltaTime * m_SmoothSpeed);
     }
 }
 
@@ -98,8 +98,8 @@ void Card::OnRender()
     );
 }
 
-// Bypass lerp and move rendered instantly to screenPosition
+// Bypass lerp and move rendered instantly to worldPosition
 void Card::SnapToPosition()
 {
-    renderPosition = screenPosition;
+    renderPosition = worldPosition;
 }

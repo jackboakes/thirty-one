@@ -7,9 +7,6 @@ class SceneRoot : public Element {};
 
 TestLayer::TestLayer()
 {
-    m_gameCanvas = LoadRenderTexture(GameResolution::width, GameResolution::height);
-    SetTextureFilter(m_gameCanvas.texture, TEXTURE_FILTER_POINT);
-
     m_SceneRoot = std::make_unique<SceneRoot>();
 
     // Create Hand
@@ -33,7 +30,6 @@ TestLayer::TestLayer()
 
 TestLayer::~TestLayer()
 {
-    UnloadRenderTexture(m_gameCanvas);
     m_SceneRoot.reset();
 }
 
@@ -56,8 +52,8 @@ void TestLayer::Update(float deltaTime)
         const Vector2 minWorld { GetScreenToWorld2D({ 0, 0 }, m_Camera2D) };
         const Vector2 maxWorld { GetScreenToWorld2D({ screenWidth, screenHeight }, m_Camera2D) };
 
-        m_DraggedCard->screenPosition.x = std::clamp(targetX, minWorld.x, maxWorld.x - m_DraggedCard->size.x);
-        m_DraggedCard->screenPosition.y = std::clamp(targetY, minWorld.y, maxWorld.y - m_DraggedCard->size.y);
+        m_DraggedCard->worldPosition.x = std::clamp(targetX, minWorld.x, maxWorld.x - m_DraggedCard->size.x);
+        m_DraggedCard->worldPosition.y = std::clamp(targetY, minWorld.y, maxWorld.y - m_DraggedCard->size.y);
     }
 
     if (m_SceneRoot)
@@ -101,8 +97,8 @@ bool TestLayer::OnMouseButtonPressed(int button)
             m_DraggedCard->isVisible = false;
 
             m_DragOffset = {
-                m_DraggedCard->screenPosition.x - worldMouse.x,
-                m_DraggedCard->screenPosition.y - worldMouse.y
+                m_DraggedCard->worldPosition.x - worldMouse.x,
+                m_DraggedCard->worldPosition.y - worldMouse.y
             };
             return true;
         }

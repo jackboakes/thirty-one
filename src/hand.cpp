@@ -25,17 +25,17 @@ void Hand::OnUpdate(float deltaTime)
 
 	if (draggedCard)
 	{
+		// Sort by X position
 		std::sort(m_Children.begin(), m_Children.end(),
 			[](const std::unique_ptr<Element>& a, const std::unique_ptr<Element>& b) {
-				return a->screenPosition.x < b->screenPosition.x;
+				return a->worldPosition.x < b->worldPosition.x;
 			});
 
-		if (draggedCard)
-		{
-			draggedCard->localPosition.x = draggedCard->screenPosition.x - screenPosition.x;
-			draggedCard->localPosition.y = draggedCard->screenPosition.y - screenPosition.y;
-		}
+		// Sync localPosition to match the mouse-controlled worldPosition
+		draggedCard->localPosition.x = draggedCard->worldPosition.x - worldPosition.x;
+		draggedCard->localPosition.y = draggedCard->worldPosition.y - worldPosition.y;
 
+		// Apply new order
 		Layout();
 	}
 }
@@ -89,21 +89,21 @@ void Hand::OnLayout()
 
 void Hand::OnRender()
 {
-	Rectangle bgRect { screenPosition.x, screenPosition.y, size.x, size.y };
+	Rectangle bgRect { worldPosition.x, worldPosition.y, size.x, size.y };
 
 	DrawRectangleRounded(bgRect, 0.1f, 10, Fade(BLACK, 0.35f));
 }
 
-Card* Hand::GetCardAt(Vector2 screenPosition)
+Card* Hand::GetCardAt(Vector2 worldPosition)
 {
 	for (auto it { m_Children.rbegin() }; it != m_Children.rend(); ++it)
 	{
 		Element* element { it->get() };
 		Card* card { static_cast<Card*>(element) };
 
-		Rectangle rec { card->screenPosition.x, card->screenPosition.y, card->size.x, card->size.y };
+		Rectangle rec { card->worldPosition.x, card->worldPosition.y, card->size.x, card->size.y };
 
-		if (CheckCollisionPointRec(screenPosition, rec))
+		if (CheckCollisionPointRec(worldPosition, rec))
 		{
 			return card;
 		}
