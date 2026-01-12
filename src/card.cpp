@@ -2,53 +2,50 @@
 #include "raylib.h"
 #include "raymath.h"
 
-Texture2D Card::s_CardAtlasTexture;
-int Card::s_RefCount = 0;
+Texture2D CardRenderer::s_Atlas;
 
-Card::Card(Suit suit, Rank rank)
-    : m_Suit(suit), m_Rank(rank)
+void CardRenderer::Initialise()
 {
-    if (s_RefCount == 0)
+    if (s_Atlas.id == 0)
     {
-        s_CardAtlasTexture = LoadTexture("../assets/cardAtlas.png");
-        SetTextureFilter(s_CardAtlasTexture, TEXTURE_FILTER_POINT);
+        s_Atlas = LoadTexture("../assets/cardAtlas.png");
+        SetTextureFilter(s_Atlas, TEXTURE_FILTER_POINT);
     }
-    s_RefCount++;
-
-    float spriteWidth = 64.0f;
-    float spriteHeight = 96.0f;
-
-    size = { spriteWidth * 2.0f, spriteHeight * 2.0f };
-    m_SourceRec = GetSourceRec(spriteWidth, spriteHeight);
 }
 
-Card::~Card()
+void CardRenderer::Shutdown()
 {
-    s_RefCount--;
-    if (s_RefCount <= 0)
+    if (s_Atlas.id != 0)
     {
-        UnloadTexture(s_CardAtlasTexture);
+        UnloadTexture(s_Atlas);
+        s_Atlas.id = 0;
     }
-
 }
 
-Rectangle Card::GetSourceRec(float slotWidth, float slotHeight) const
+Vector2 CardRenderer::GetSize()
 {
+    // size of cards sprites are 64x96 source * 2 scale
+    return { 128.0f, 192.0f };
+}
+
+Rectangle CardRenderer::GetSourceRectangle(Suit suit, Rank rank, bool isFaceUp) 
+{
+    float slotWidth { 64.0f };
+    float slotHeight { 96.0f };
     int xIndex { 0 };
     int yIndex { 0 };
 
-    switch (m_Suit)
-    {
-    case Suit::Diamonds: yIndex = 0; break;
-    case Suit::Clubs:    yIndex = 1; break; 
-    case Suit::Hearts:   yIndex = 2; break;
-    case Suit::Spades:   yIndex = 3; break;
-    }
-
-
     if (isFaceUp)
     {
-        xIndex = static_cast<int>(m_Rank) - 1;
+        switch (suit)
+        {
+        case Suit::Diamonds: yIndex = 0; break;
+        case Suit::Clubs:    yIndex = 1; break;
+        case Suit::Hearts:   yIndex = 2; break;
+        case Suit::Spades:   yIndex = 3; break;
+        }
+
+        xIndex = static_cast<int>(rank) - 1;
     }
     else
     {
@@ -65,41 +62,37 @@ Rectangle Card::GetSourceRec(float slotWidth, float slotHeight) const
     };
 }
 
-void Card::OnUpdate(float deltaTime)
+void CardRenderer::Draw(const CardEntity& card)
 {
-    if (Vector2Distance(renderPosition, worldPosition) < 0.5f)
+    if (!card.isVisible)
     {
-        renderPosition = worldPosition;
+        return;
     }
-    else
-    {
-        renderPosition = Vector2Lerp(renderPosition, worldPosition, deltaTime * m_SmoothSpeed);
-    }
-}
 
-void Card::OnRender()
-{
-    Rectangle destRec {
-            renderPosition.x,
-            renderPosition.y,
-            size.x,
-            size.y
+    const Rectangle source { GetSourceRectangle(card.suit, card.rank, card.isFaceUp) };
+    
+    Vector2 originalSize { GetSize() };
+    float centerX = card.position.x + (originalSize.x * 0.5f);
+    float centerY = card.position.y + (originalSize.y * 0.5f);
+
+    const Rectangle destination {
+            centerX,
+            centerY,
+            originalSize.x * card.scale,
+            originalSize.y * card.scale
     };
 
-    constexpr Vector2 origin { 0.0f, 0.0f };
+    const Vector2 origin {
+        destination.width * 0.5f,
+        destination.height * 0.5f
+    };
 
     DrawTexturePro(
-        s_CardAtlasTexture,
-        m_SourceRec,
-        destRec,
+        s_Atlas,
+        source,
+        destination,
         origin,
-        0.0f, 
+        card.rotation, 
         WHITE
     );
-}
-
-// Bypass lerp and move rendered instantly to worldPosition
-void Card::SnapToPosition()
-{
-    renderPosition = worldPosition;
 }

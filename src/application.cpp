@@ -40,7 +40,7 @@ void Application::ProcessInput()
 	{
 		for (auto it { m_layerStack.rbegin() }; it != m_layerStack.rend(); ++it) 
 		{
-			if ((*it)->OnMouseButtonPressed(MOUSE_BUTTON_LEFT))
+			if ((*it)->OnMouseButtonPressed())
 			{
 				break;
 			}
@@ -51,7 +51,7 @@ void Application::ProcessInput()
 	{
 		for (auto it { m_layerStack.rbegin() }; it != m_layerStack.rend(); ++it) 
 		{
-			if ((*it)->OnMouseButtonReleased(MOUSE_BUTTON_LEFT))
+			if ((*it)->OnMouseButtonReleased())
 			{
 				break;
 			}
@@ -65,6 +65,11 @@ void Application::ProcessInput()
 		{
 			Vector2 mousePosition = GetMousePosition();
 			if ((*it)->OnMouseMoved(mousePosition))
+			{
+				break;
+			}
+
+			if ((*it)->OnMouseHover(mousePosition))
 			{
 				break;
 			}

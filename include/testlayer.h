@@ -1,9 +1,7 @@
 #pragma once
 #include "layer.h"
-#include "element.h"
-#include "hand.h"
-#include "card.h"
-#include <memory>
+#include "gamestate.h"
+#include "handzone.h"
 
 struct CanvasTransform
 {
@@ -14,21 +12,21 @@ struct CanvasTransform
 class TestLayer : public Layer {
 private:
     Camera2D  m_Camera2D {0};
-    std::unique_ptr<Element> m_SceneRoot;
+    GameState m_State;
+    HandZone  m_HandZone;
 
-    Hand* m_HandPtr { nullptr };
-    Card* m_DraggedCard { nullptr };
-    Vector2 m_DragOffset { 0.0f, 0.0f };
 
     CanvasTransform GetCanvasTransform() const;
-
+    int GetCardIdUnderMouse(Vector2 worldPosition) const;
 public:
     TestLayer();
     ~TestLayer() override;
+
     void Update(float deltatime) override;
     void Draw() override;
 
-    bool OnMouseButtonPressed(int button) override;
-    bool OnMouseButtonReleased(int button) override;
+    bool OnMouseButtonPressed() override;
+    bool OnMouseButtonReleased() override;
     bool OnMouseMoved(Vector2 position) override { return false; }
+    bool OnMouseHover(Vector2 position) override;
 };
