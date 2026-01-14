@@ -103,25 +103,19 @@ void CardRenderer::Draw(const CardEntity& card)
         destination.height * 0.5f
     };
 
-    // Animate smoothly the shadow as scale increases
-    const float rawHeight = (card.scale - 0.975f) * 200.0f;
-    // Clamp to max shadow to 20 pixels
-    float height = std::min(rawHeight, 20.0f);
-    const float baseDist = 8.0f;
+    Vector2 screenCentre = { GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f };
 
-    // Light source is at centre of screen
-    const Vector2 screenCenter = { GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f };
-    Vector2 distFromCenter = { centerX - screenCenter.x, centerY - screenCenter.y };
+    // Shadow x always pulls toward screen centre
+    float shadowX = (centerX - screenCentre.x) * -0.03f;
 
-    // Negate so the shadow pulls into the centre of the screen
-    Vector2 shadowOffset = {
-        distFromCenter.x * -0.02f,
-        distFromCenter.y * -0.02f
-    };
+    // Gives idle cards a small amount of shadow
+    float baseShadowY = 6.0f;
+    // Scale is what is determining when the card is lifted
+    // Animate the shadows y pos smoothly as scale increases
+    float liftShadowY = (card.scale > 1.0f) ? (card.scale - 1.0f) * 200.0f : 0.0f;
+    float shadowY = baseShadowY + liftShadowY;
 
-    // Determine the side the shadow is on
-    shadowOffset.x += (shadowOffset.x > 0 ? height : -height) * 0.05f;
-    shadowOffset.y += baseDist + height;
+    Vector2 shadowOffset = { shadowX, shadowY };
 
     Rectangle shadowDest = destination;
     shadowDest.x += shadowOffset.x;
