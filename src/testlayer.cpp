@@ -154,7 +154,8 @@ void TestLayer::Update(float deltaTime)
         }
         else if (!m_State.drag.isActive && m_State.hoveredCardId == card.id) 
         {
-            targetScale = 1.1f;
+            targetScale = 1.0f;
+            // TODO:: add feature card shake on hover
         }
 
         card.scale = Lerp(card.scale, targetScale, lerpFactor);
@@ -179,7 +180,8 @@ void TestLayer::Draw()
     m_HandZone.Draw();
 
     // Populate with cards
-    std::vector<int> drawOrder (m_State.cards.size());
+    std::vector<int> drawOrder;
+    drawOrder.reserve(m_State.cards.size());
     for (int i { 0 }; i < m_State.cards.size(); i++)
     {
         drawOrder.push_back(i);

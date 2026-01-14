@@ -1,6 +1,6 @@
 #include "card.h"
 #include "raylib.h"
-#include "raymath.h"
+#include "algorithm"
 
 Texture2D CardRenderer::s_Atlas;
 Shader CardRenderer:: s_PixelShader;
@@ -103,8 +103,43 @@ void CardRenderer::Draw(const CardEntity& card)
         destination.height * 0.5f
     };
 
+    // Animate smoothly the shadow as scale increases
+    const float rawHeight = (card.scale - 0.975f) * 200.0f;
+    // Clamp to max shadow to 20 pixels
+    float height = std::min(rawHeight, 20.0f);
+    const float baseDist = 8.0f;
+
+    // Light source is at centre of screen
+    const Vector2 screenCenter = { GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f };
+    Vector2 distFromCenter = { centerX - screenCenter.x, centerY - screenCenter.y };
+
+    // Negate so the shadow pulls into the centre of the screen
+    Vector2 shadowOffset = {
+        distFromCenter.x * -0.02f,
+        distFromCenter.y * -0.02f
+    };
+
+    // Determine the side the shadow is on
+    shadowOffset.x += (shadowOffset.x > 0 ? height : -height) * 0.05f;
+    shadowOffset.y += baseDist + height;
+
+    Rectangle shadowDest = destination;
+    shadowDest.x += shadowOffset.x;
+    shadowDest.y += shadowOffset.y;
+
+    // Shadow
+    DrawTexturePro(
+        s_Atlas,
+        source,
+        shadowDest,
+        origin,
+        card.rotation,
+        Fade(BLACK, 0.25f)
+    );
+
     BeginShaderMode(s_PixelShader);
 
+    // Regular card
     DrawTexturePro(
         s_Atlas,
         source,
