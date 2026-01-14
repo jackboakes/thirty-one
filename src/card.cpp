@@ -3,14 +3,24 @@
 #include "raymath.h"
 
 Texture2D CardRenderer::s_Atlas;
+Shader CardRenderer:: s_PixelShader;
 
 void CardRenderer::Initialise()
 {
     if (s_Atlas.id == 0)
     {
         s_Atlas = LoadTexture("../assets/cardAtlas.png");
-        SetTextureFilter(s_Atlas, TEXTURE_FILTER_POINT);
+        SetTextureFilter(s_Atlas, TEXTURE_FILTER_BILINEAR);
     }
+
+    if (s_PixelShader.id == 0)
+    {
+        s_PixelShader = LoadShader(0, "../res/shaders/pixelfiltering.fs");
+    }
+
+    int sizeLocation = GetShaderLocation(s_PixelShader, "textureSize");
+    float size[2] = { static_cast<float>(s_Atlas.width), static_cast<float>(s_Atlas.height) };
+    SetShaderValue(s_PixelShader, sizeLocation, size, SHADER_UNIFORM_VEC2);
 }
 
 void CardRenderer::Shutdown()
@@ -19,6 +29,12 @@ void CardRenderer::Shutdown()
     {
         UnloadTexture(s_Atlas);
         s_Atlas.id = 0;
+    }
+    
+    if (s_PixelShader.id != 0)
+    {
+        UnloadShader(s_PixelShader);
+        s_PixelShader.id = 0;
     }
 }
 
@@ -87,6 +103,8 @@ void CardRenderer::Draw(const CardEntity& card)
         destination.height * 0.5f
     };
 
+    BeginShaderMode(s_PixelShader);
+
     DrawTexturePro(
         s_Atlas,
         source,
@@ -95,4 +113,6 @@ void CardRenderer::Draw(const CardEntity& card)
         card.rotation, 
         WHITE
     );
+
+    EndShaderMode();
 }

@@ -6,6 +6,7 @@
 class CardRenderer {
 private:
 	static Texture2D s_Atlas;
+	static Shader s_PixelShader;
 	static Rectangle GetSourceRectangle(Suit suit, Rank rank, bool isFaceUp);
 public:
 	static void Initialise();

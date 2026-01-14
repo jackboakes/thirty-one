@@ -176,7 +176,6 @@ void TestLayer::Draw()
     m_Camera2D.target = { 0, 0 };
 
     BeginMode2D(m_Camera2D);
-
     m_HandZone.Draw();
 
     // Populate with cards

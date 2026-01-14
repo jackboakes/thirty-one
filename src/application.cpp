@@ -3,7 +3,7 @@
 Application::Application()
 {
 	// Window
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
 	// Smaller than screen size so that the title bar doesn't get hidden
 	InitWindow(1280, 720, "Thirty One");
 	SetWindowState(FLAG_WINDOW_MAXIMIZED);
