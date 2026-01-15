@@ -29,7 +29,6 @@ enum class Rank {
 enum class CardZone {
 	Hand,
 	Deck
-
 	// discard pile
 };
 
@@ -77,7 +76,7 @@ struct Message {
 
 struct GameState {
 	// TODO: set to 52 for all cards
-	std::array<CardEntity, 4> cards; 
+	std::array<CardEntity, 52> cards; 
 
 	// Queue of input and events
 	std::deque<Message> messages;

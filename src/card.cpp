@@ -103,33 +103,36 @@ void CardRenderer::Draw(const CardEntity& card)
         destination.height * 0.5f
     };
 
-    Vector2 screenCentre = { GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f };
+    if (card.zone == CardZone::Hand)
+    {
+        Vector2 screenCentre = { GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f };
 
-    // Shadow x always pulls toward screen centre
-    float shadowX = (centerX - screenCentre.x) * -0.03f;
+        // Shadow x always pulls toward screen centre
+        float shadowX = (centerX - screenCentre.x) * -0.03f;
 
-    // Gives idle cards a small amount of shadow
-    float baseShadowY = 6.0f;
-    // Scale is what is determining when the card is lifted
-    // Animate the shadows y pos smoothly as scale increases
-    float liftShadowY = (card.scale > 1.0f) ? (card.scale - 1.0f) * 200.0f : 0.0f;
-    float shadowY = baseShadowY + liftShadowY;
+        // Gives idle cards a small amount of shadow
+        float baseShadowY = 6.0f;
+        // Scale is what is determining when the card is lifted
+        // Animate the shadows y pos smoothly as scale increases
+        float liftShadowY = (card.scale > 1.0f) ? (card.scale - 1.0f) * 200.0f : 0.0f;
+        float shadowY = baseShadowY + liftShadowY;
 
-    Vector2 shadowOffset = { shadowX, shadowY };
+        Vector2 shadowOffset = { shadowX, shadowY };
 
-    Rectangle shadowDest = destination;
-    shadowDest.x += shadowOffset.x;
-    shadowDest.y += shadowOffset.y;
+        Rectangle shadowDest = destination;
+        shadowDest.x += shadowOffset.x;
+        shadowDest.y += shadowOffset.y;
 
-    // Shadow
-    DrawTexturePro(
-        s_Atlas,
-        source,
-        shadowDest,
-        origin,
-        card.rotation,
-        Fade(BLACK, 0.25f)
-    );
+        // Shadow
+        DrawTexturePro(
+            s_Atlas,
+            source,
+            shadowDest,
+            origin,
+            card.rotation,
+            Fade(BLACK, 0.25f)
+        );
+    }
 
     BeginShaderMode(s_PixelShader);
 

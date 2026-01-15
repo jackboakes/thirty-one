@@ -9,41 +9,39 @@ TestLayer::TestLayer()
 {
     CardRenderer::Initialise();
 
-    CardEntity aceOfSpades;
-    aceOfSpades.id = 0;
-    aceOfSpades.rank = Rank::Ace;
-    aceOfSpades.suit = Suit::Spades;
-    aceOfSpades.zone = CardZone::Hand;
-    aceOfSpades.isFaceUp = true;
-    m_State.cards[0] = aceOfSpades ;
+    int cardIndex { 0 };
+    const Vector2 cardSize = CardRenderer::GetSize();
+    const Vector2 halfCard = { cardSize.x * 0.5f, cardSize.y * 0.5f };
 
-    CardEntity tenOfSpades;
-    tenOfSpades.id = 1;
-    tenOfSpades.rank = Rank::Ten;
-    tenOfSpades.suit = Suit::Spades;
-    tenOfSpades.zone = CardZone::Hand;
-    tenOfSpades.isFaceUp = true;
-    m_State.cards[1] = tenOfSpades;
-
-    CardEntity jackOfHearts;
-    jackOfHearts.id = 2;
-    jackOfHearts.rank = Rank::Jack;
-    jackOfHearts.suit = Suit::Hearts;
-    jackOfHearts.zone = CardZone::Hand;
-    jackOfHearts.isFaceUp = true;
-    m_State.cards[2] = jackOfHearts;
-
-    CardEntity kingOfClubs;
-    kingOfClubs.id = 3;
-    kingOfClubs.rank = Rank::King;
-    kingOfClubs.suit = Suit::Clubs;
-    kingOfClubs.zone = CardZone::Hand;
-    kingOfClubs.isFaceUp = true;
-    m_State.cards[3] = kingOfClubs;
-
-    for (auto& card : m_State.cards) 
+    for (int suit { 0 }; suit < 4; suit++)
     {
-        card.position = { GameResolution::f_Width / 2, GameResolution::f_Height / 2, 0 };
+        for (int rank { 1 }; rank <= 13; rank++)
+        {
+            CardEntity& card = m_State.cards[cardIndex];
+
+            card.id = cardIndex;
+            card.suit = static_cast<Suit>(suit);
+            card.rank = static_cast<Rank>(rank);
+            card.isFaceUp = false;
+            card.zone = CardZone::Deck;
+
+            // Offset to create a stacked deck look
+            const float stackOffset = card.id * 0.2f;
+            card.position = { 
+                (GameResolution::f_Width * 0.5f) - halfCard.x + stackOffset,
+                (GameResolution::f_Height * 0.5f) - halfCard.y - stackOffset, 
+                0
+            };
+            card.targetPosition = card.position;
+            cardIndex++;
+        }
+    }
+
+
+    for (int i { 0 }; i < 2; i++)
+    {
+        m_State.cards[i].zone = CardZone::Hand;
+        m_State.cards[i].isFaceUp = true;
     }
 }
 
@@ -70,7 +68,8 @@ void TestLayer::Update(float deltaTime)
         {
             // Calculate the offset based on where we clicked
             CardEntity& card { m_State.cards[messsage.params.cardID] };
- 
+            card.zone = CardZone::Hand;
+            card.isFaceUp = true;
             m_State.drag.isActive = true;
             m_State.drag.cardId = messsage.params.cardID;
             m_State.drag.dragOffset = {
@@ -190,7 +189,7 @@ void TestLayer::Draw()
     // Sort based on draw order
     std::sort(drawOrder.begin(), drawOrder.end(), [&](int a, int b) {
         return m_State.cards[a].sortOrder < m_State.cards[b].sortOrder;
-        });
+    });
 
     // Draw
     for (int id : drawOrder) 
