@@ -3,7 +3,7 @@
 #include "globals.h"
 #include "card.h"
 #include <algorithm>
-
+#include <vector>
 
 TestLayer::TestLayer()
 {
@@ -15,7 +15,7 @@ TestLayer::TestLayer()
     aceOfSpades.suit = Suit::Spades;
     aceOfSpades.zone = CardZone::Hand;
     aceOfSpades.isFaceUp = true;
-    m_State.cards.push_back(aceOfSpades);
+    m_State.cards[0] = aceOfSpades ;
 
     CardEntity tenOfSpades;
     tenOfSpades.id = 1;
@@ -23,7 +23,7 @@ TestLayer::TestLayer()
     tenOfSpades.suit = Suit::Spades;
     tenOfSpades.zone = CardZone::Hand;
     tenOfSpades.isFaceUp = true;
-    m_State.cards.push_back(tenOfSpades);
+    m_State.cards[1] = tenOfSpades;
 
     CardEntity jackOfHearts;
     jackOfHearts.id = 2;
@@ -31,7 +31,7 @@ TestLayer::TestLayer()
     jackOfHearts.suit = Suit::Hearts;
     jackOfHearts.zone = CardZone::Hand;
     jackOfHearts.isFaceUp = true;
-    m_State.cards.push_back(jackOfHearts);
+    m_State.cards[2] = jackOfHearts;
 
     CardEntity kingOfClubs;
     kingOfClubs.id = 3;
@@ -39,7 +39,7 @@ TestLayer::TestLayer()
     kingOfClubs.suit = Suit::Clubs;
     kingOfClubs.zone = CardZone::Hand;
     kingOfClubs.isFaceUp = true;
-    m_State.cards.push_back(kingOfClubs);
+    m_State.cards[3] = kingOfClubs;
 
     for (auto& card : m_State.cards) 
     {

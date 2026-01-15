@@ -2,7 +2,7 @@
 #include "card.h"
 #include "globals.h"
 #include <algorithm>
-
+#include <vector>
 
 HandZone::HandZone()
 {

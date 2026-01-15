@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include <vector>
+#include <array>
 #include <deque>
 
 enum class Suit {
@@ -76,7 +76,8 @@ struct Message {
 };
 
 struct GameState {
-	std::vector<CardEntity> cards;
+	// TODO: set to 52 for all cards
+	std::array<CardEntity, 4> cards; 
 
 	// Queue of input and events
 	std::deque<Message> messages;
