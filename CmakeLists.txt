@@ -30,7 +30,7 @@ set(HEADERS
     include/card.h
     include/gamestate.h
     include/layer.h
-    include/testlayer.h
+    include/gameplaylayer.h
     include/globals.h
     include/handzone.h
 )
@@ -40,8 +40,7 @@ set(SOURCES
     src/backgroundlayer.cpp
     src/card.cpp
     src/main.cpp
-    src/gamestate.cpp
-    src/testlayer.cpp
+    src/gameplaylayer.cpp
     src/handzone.cpp
 )
 

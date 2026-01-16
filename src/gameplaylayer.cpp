@@ -1,11 +1,11 @@
-#include "testlayer.h"
+#include "gameplaylayer.h"
 #include "raymath.h"
 #include "globals.h"
 #include "card.h"
 #include <algorithm>
 #include <vector>
 
-TestLayer::TestLayer()
+GameplayLayer::GameplayLayer()
 {
     CardRenderer::Initialise();
 
@@ -38,19 +38,21 @@ TestLayer::TestLayer()
     }
 
 
-    for (int i { 0 }; i < 2; i++)
-    {
-        m_State.cards[i].zone = CardZone::Hand;
-        m_State.cards[i].isFaceUp = true;
-    }
+        m_State.cards[51].zone = CardZone::Hand;
+        m_State.cards[51].isFaceUp = true;
+
+        m_State.cards[13].zone = CardZone::Hand;
+        m_State.cards[13].isFaceUp = true;
+        m_State.cards[10].zone = CardZone::Hand;
+        m_State.cards[10].isFaceUp = true;
 }
 
-TestLayer::~TestLayer()
+GameplayLayer::~GameplayLayer()
 {
     CardRenderer::Shutdown();
 }
 
-void TestLayer::Update(float deltaTime)
+void GameplayLayer::Update(float deltaTime)
 {
     // process messages
     while (!m_State.messages.empty())
@@ -168,7 +170,7 @@ void TestLayer::Update(float deltaTime)
 
 }
 
-void TestLayer::Draw()
+void GameplayLayer::Draw()
 {
     CanvasTransform canvasTransform { GetCanvasTransform() };
     m_Camera2D.zoom = canvasTransform.scale;
@@ -200,7 +202,7 @@ void TestLayer::Draw()
     EndMode2D();
 }
 
-bool TestLayer::OnMouseButtonPressed()
+bool GameplayLayer::OnMouseButtonPressed()
 {
     Vector2 mouseWorld { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
     int hitId { GetCardIdUnderMouse(mouseWorld) };
@@ -219,7 +221,7 @@ bool TestLayer::OnMouseButtonPressed()
     return false;
 }
 
-bool TestLayer::OnMouseButtonReleased()
+bool GameplayLayer::OnMouseButtonReleased()
 {
     if (m_State.drag.isActive)
     {
@@ -237,7 +239,7 @@ bool TestLayer::OnMouseButtonReleased()
     return false;
 }
 
-bool TestLayer::OnMouseHover(Vector2 positon)
+bool GameplayLayer::OnMouseHover(Vector2 positon)
 {
     Vector2 mouseWorld { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
     int hitId { GetCardIdUnderMouse(mouseWorld) };
@@ -257,7 +259,7 @@ bool TestLayer::OnMouseHover(Vector2 positon)
 
 // Calculates the render transform required to center and scale the game content 
 // to the current window dimensions without stretching.
-CanvasTransform TestLayer::GetCanvasTransform() const
+CanvasTransform GameplayLayer::GetCanvasTransform() const
 {
     const float windowWidth { static_cast<float>(GetScreenWidth()) };
     const float windowHeight { static_cast<float>(GetScreenHeight()) };
@@ -276,7 +278,7 @@ CanvasTransform TestLayer::GetCanvasTransform() const
 }
 
 
-int TestLayer::GetCardIdUnderMouse(Vector2 worldPosition) const
+int GameplayLayer::GetCardIdUnderMouse(Vector2 worldPosition) const
 {
     for (int i { static_cast<int>(m_State.cards.size() - 1) }; i >= 0; i--)
     {

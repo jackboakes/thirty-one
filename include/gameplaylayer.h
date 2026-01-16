@@ -9,7 +9,7 @@ struct CanvasTransform
     Vector2 offset;
 };
 
-class TestLayer : public Layer {
+class GameplayLayer : public Layer {
 private:
     Camera2D  m_Camera2D {0};
     GameState m_State;
@@ -19,8 +19,8 @@ private:
     CanvasTransform GetCanvasTransform() const;
     int GetCardIdUnderMouse(Vector2 worldPosition) const;
 public:
-    TestLayer();
-    ~TestLayer() override;
+    GameplayLayer();
+    ~GameplayLayer() override;
 
     void Update(float deltatime) override;
     void Draw() override;

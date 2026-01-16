@@ -1,11 +1,11 @@
 #include "application.h"
-#include "BackgroundLayer.h"
-#include "TestLayer.h"
+#include "backgroundlayer.h"
+#include "gameplaylayer.h"
 
 int main()
 {
 	Application& application { Application::Instance() };
 	application.PushLayer<BackgroundLayer>();
-	application.PushLayer<TestLayer>();
+	application.PushLayer<GameplayLayer>();
 	application.Run();
 }
