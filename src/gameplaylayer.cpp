@@ -13,6 +13,7 @@ GameplayLayer::GameplayLayer()
     const Vector2 cardSize = CardRenderer::GetSize();
     const Vector2 halfCard = { cardSize.x * 0.5f, cardSize.y * 0.5f };
 
+    // Spawn deck in centre of screen
     for (int suit { 0 }; suit < 4; suit++)
     {
         for (int rank { 1 }; rank <= 13; rank++)
@@ -54,7 +55,49 @@ GameplayLayer::~GameplayLayer()
 
 void GameplayLayer::Update(float deltaTime)
 {
-    // process messages
+    ProcessMessages();
+
+    UpdateLogic(deltaTime);
+
+    UpdateAnimation(deltaTime);
+}
+
+void GameplayLayer::Draw()
+{
+    CanvasTransform canvasTransform { GetCanvasTransform() };
+    m_Camera2D.zoom = canvasTransform.scale;
+    m_Camera2D.offset = canvasTransform.offset;
+    m_Camera2D.target = { 0, 0 };
+
+    BeginMode2D(m_Camera2D);
+    m_HandZone.Draw();
+
+    // Populate with cards
+    std::vector<int> drawOrder;
+    drawOrder.reserve(m_State.cards.size());
+    for (int i { 0 }; i < m_State.cards.size(); i++)
+    {
+        drawOrder.push_back(i);
+    }
+        
+    // Sort based on draw order
+    std::sort(drawOrder.begin(), drawOrder.end(), [&](int a, int b) {
+        return m_State.cards[a].sortOrder < m_State.cards[b].sortOrder;
+    });
+
+    // Draw
+    for (int id : drawOrder) 
+    {
+        CardRenderer::Draw(m_State.cards[id]);
+    }
+
+    EndMode2D();
+}
+
+
+// Handle User input/events
+void GameplayLayer::ProcessMessages()
+{
     while (!m_State.messages.empty())
     {
         Message messsage { m_State.messages.front() };
@@ -101,9 +144,11 @@ void GameplayLayer::Update(float deltaTime)
         default: break;
         }
     }
-
+}
+void GameplayLayer::UpdateLogic(float deltaTime)
+{
     // drag physics
-    if (m_State.drag.isActive) 
+    if (m_State.drag.isActive)
     {
         const Vector2 mouseWorld { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
         CardEntity& draggedCard { m_State.cards[m_State.drag.cardId] };
@@ -137,10 +182,11 @@ void GameplayLayer::Update(float deltaTime)
     }
 
     m_HandZone.UpdateLayout(m_State);
-
-
+}
+void GameplayLayer::UpdateAnimation(float deltaTime)
+{
     // rough animation and drag
-    Vector2 mouseWorld { GetScreenToWorld2D(GetMousePosition(), m_Camera2D) };
+
 
     float snapSpeed { 15.0f };
     float lerpFactor { 1.0f - powf(2.0f, -snapSpeed * deltaTime) };
@@ -149,11 +195,11 @@ void GameplayLayer::Update(float deltaTime)
     {
         float targetScale { 1.0f };
 
-        if (m_State.drag.isActive && m_State.drag.cardId == card.id) 
+        if (m_State.drag.isActive && m_State.drag.cardId == card.id)
         {
             targetScale = 1.1f;
         }
-        else if (!m_State.drag.isActive && m_State.hoveredCardId == card.id) 
+        else if (!m_State.drag.isActive && m_State.hoveredCardId == card.id)
         {
             targetScale = 1.0f;
             // TODO:: add feature card shake on hover
@@ -167,39 +213,6 @@ void GameplayLayer::Update(float deltaTime)
             card.position.y = Lerp(card.position.y, card.targetPosition.y, lerpFactor);
         }
     }
-
-}
-
-void GameplayLayer::Draw()
-{
-    CanvasTransform canvasTransform { GetCanvasTransform() };
-    m_Camera2D.zoom = canvasTransform.scale;
-    m_Camera2D.offset = canvasTransform.offset;
-    m_Camera2D.target = { 0, 0 };
-
-    BeginMode2D(m_Camera2D);
-    m_HandZone.Draw();
-
-    // Populate with cards
-    std::vector<int> drawOrder;
-    drawOrder.reserve(m_State.cards.size());
-    for (int i { 0 }; i < m_State.cards.size(); i++)
-    {
-        drawOrder.push_back(i);
-    }
-        
-    // Sort based on draw order
-    std::sort(drawOrder.begin(), drawOrder.end(), [&](int a, int b) {
-        return m_State.cards[a].sortOrder < m_State.cards[b].sortOrder;
-    });
-
-    // Draw
-    for (int id : drawOrder) 
-    {
-        CardRenderer::Draw(m_State.cards[id]);
-    }
-
-    EndMode2D();
 }
 
 bool GameplayLayer::OnMouseButtonPressed()

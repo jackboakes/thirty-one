@@ -15,6 +15,13 @@ private:
     GameState m_State;
     HandZone  m_HandZone;
 
+    // Handle User input/events
+    void ProcessMessages();
+    // Calculate the target state
+    void UpdateLogic(float deltaTime);
+    // Move the visual state towards target
+    void UpdateAnimation(float deltaTime);
+
 
     CanvasTransform GetCanvasTransform() const;
     int GetCardIdUnderMouse(Vector2 worldPosition) const;
