@@ -2,6 +2,8 @@
 #include "layer.h"
 #include "gamestate.h"
 #include "handzone.h"
+#include "discardzone.h"
+#include "deckzone.h"
 
 struct CanvasTransform
 {
@@ -13,7 +15,9 @@ class GameplayLayer : public Layer {
 private:
     Camera2D  m_Camera2D {0};
     GameState m_State;
+    DeckZone  m_DeckZone;
     HandZone  m_HandZone;
+    DiscardZone m_DiscardZone;
 
     // Handle User input/events
     void ProcessMessages();

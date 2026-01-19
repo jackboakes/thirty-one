@@ -1,7 +1,7 @@
-#include "raylib.h"
-#include "gamestate.h"
+#pragma once
+#include "zone.h"
 
-class HandZone {
+class HandZone : public Zone {
 private:
 	// Max size we have can have hand at any point in game
 	const int m_capacity { 4 };
@@ -10,14 +10,9 @@ private:
 	// The % of a card showing without overlap
 	const float m_cardSpacing { 0.75f };
 
-	// The visual area of the hand container/zone
-	Rectangle m_bounds {};
-
 public:
 	HandZone();
 
-	void UpdateLayout(GameState& state);
-	// Draw the hand container only
-	void Draw();
-	bool IsPointInside(Vector2 worldPosition) const;
+	void UpdateLayout(GameState& state) override;
+	void Draw() override;
 };

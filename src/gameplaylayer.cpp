@@ -10,10 +10,8 @@ GameplayLayer::GameplayLayer()
     CardRenderer::Initialise();
 
     int cardIndex { 0 };
-    const Vector2 cardSize = CardRenderer::GetSize();
-    const Vector2 halfCard = { cardSize.x * 0.5f, cardSize.y * 0.5f };
 
-    // Spawn deck in centre of screen
+    // Initialize all cards into the deck
     for (int suit { 0 }; suit < 4; suit++)
     {
         for (int rank { 1 }; rank <= 13; rank++)
@@ -25,27 +23,27 @@ GameplayLayer::GameplayLayer()
             card.rank = static_cast<Rank>(rank);
             card.isFaceUp = false;
             card.zone = CardZone::Deck;
+            card.sortOrder = cardIndex;
 
-            // Offset to create a stacked deck look
-            const float stackOffset = card.id * 0.2f;
-            card.position = { 
-                (GameResolution::f_Width * 0.5f) - halfCard.x + stackOffset,
-                (GameResolution::f_Height * 0.5f) - halfCard.y - stackOffset, 
-                0
-            };
-            card.targetPosition = card.position;
             cardIndex++;
         }
     }
 
+    // Initial layout pass so cards have starting positions
+    m_DeckZone.UpdateLayout(m_State);
+    for (auto& card : m_State.cards)
+    {
+        card.position = card.targetPosition;
+    }
 
-        m_State.cards[51].zone = CardZone::Hand;
-        m_State.cards[51].isFaceUp = true;
+    // Test setup: move some cards to hand
+    m_State.cards[51].zone = CardZone::Hand;
+    m_State.cards[51].isFaceUp = true;
 
-        m_State.cards[13].zone = CardZone::Hand;
-        m_State.cards[13].isFaceUp = true;
-        m_State.cards[10].zone = CardZone::Hand;
-        m_State.cards[10].isFaceUp = true;
+    m_State.cards[13].zone = CardZone::Hand;
+    m_State.cards[13].isFaceUp = true;
+    m_State.cards[10].zone = CardZone::Hand;
+    m_State.cards[10].isFaceUp = true;
 }
 
 GameplayLayer::~GameplayLayer()
@@ -70,7 +68,9 @@ void GameplayLayer::Draw()
     m_Camera2D.target = { 0, 0 };
 
     BeginMode2D(m_Camera2D);
+    m_DeckZone.Draw();
     m_HandZone.Draw();
+    m_DiscardZone.Draw();
 
     // Populate with cards
     std::vector<int> drawOrder;
@@ -131,8 +131,13 @@ void GameplayLayer::ProcessMessages()
             if (m_HandZone.IsPointInside(messsage.params.mousePosition))
             {
                 int id { messsage.params.cardID };
-
                 m_State.cards[id].zone = CardZone::Hand;
+                m_State.cards[id].isFaceUp = true;
+            }
+            else if (m_DiscardZone.IsPointInside(messsage.params.mousePosition))
+            {
+                int id { messsage.params.cardID };
+                m_State.cards[id].zone = CardZone::Discard;
                 m_State.cards[id].isFaceUp = true;
             }
 
@@ -145,6 +150,7 @@ void GameplayLayer::ProcessMessages()
         }
     }
 }
+
 void GameplayLayer::UpdateLogic(float deltaTime)
 {
     // drag physics
@@ -181,7 +187,9 @@ void GameplayLayer::UpdateLogic(float deltaTime)
         draggedCard.position.y = std::clamp(targetY, minY, maxY);
     }
 
+    m_DeckZone.UpdateLayout(m_State);
     m_HandZone.UpdateLayout(m_State);
+    m_DiscardZone.UpdateLayout(m_State);
 }
 void GameplayLayer::UpdateAnimation(float deltaTime)
 {
@@ -293,13 +301,31 @@ CanvasTransform GameplayLayer::GetCanvasTransform() const
 
 int GameplayLayer::GetCardIdUnderMouse(Vector2 worldPosition) const
 {
-    for (int i { static_cast<int>(m_State.cards.size() - 1) }; i >= 0; i--)
+    // Build a list sorted by draw order (highest first)
+    std::vector<int> sortedIds;
+    sortedIds.reserve(m_State.cards.size());
+
+    for (int i { 0 }; i < m_State.cards.size(); i++)
     {
-        const CardEntity& card { m_State.cards[i] };
+        if (m_State.cards[i].isVisible)
+        {
+            sortedIds.push_back(i);
+        }
+    }
+
+    // Sort by sortOrder (descending - highest on top)
+    std::sort(sortedIds.begin(), sortedIds.end(), [&](int a, int b) {
+        return m_State.cards[a].sortOrder > m_State.cards[b].sortOrder;
+        });
+
+    // Check from top to bottom
+    for (int id : sortedIds)
+    {
+        const CardEntity& card { m_State.cards[id] };
         const Vector2 size { CardRenderer::GetSize() };
         const Rectangle rectangle { card.position.x, card.position.y, size.x, size.y };
 
-        if (CheckCollisionPointRec(worldPosition, rectangle)) 
+        if (CheckCollisionPointRec(worldPosition, rectangle))
         {
             return card.id;
         }

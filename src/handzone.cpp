@@ -75,8 +75,3 @@ void HandZone::Draw()
 	// Show exact bounds
 	//DrawRectangleLines(m_bounds.x, m_bounds.y, m_bounds.width, m_bounds.height, RED);
 }
-
-bool HandZone::IsPointInside(Vector2 worldPosition) const
-{
-	return CheckCollisionPointRec(worldPosition, m_bounds);
-}

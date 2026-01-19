@@ -27,9 +27,9 @@ enum class Rank {
 };
 
 enum class CardZone {
+	Deck,
 	Hand,
-	Deck
-	// discard pile
+	Discard
 };
 
 struct CardEntity {

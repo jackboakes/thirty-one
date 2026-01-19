@@ -32,7 +32,10 @@ set(HEADERS
     include/layer.h
     include/gameplaylayer.h
     include/globals.h
+    include/zone.h
+    include/deckzone.h
     include/handzone.h
+    include/discardzone.h
 )
 
 set(SOURCES
@@ -41,7 +44,9 @@ set(SOURCES
     src/card.cpp
     src/main.cpp
     src/gameplaylayer.cpp
+    src/deckzone.cpp
     src/handzone.cpp
+    src/discardzone.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
